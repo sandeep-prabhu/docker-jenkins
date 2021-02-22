@@ -1,0 +1,17 @@
+FROM ubuntu:latest as build-stage
+LABEL maintainer="Sandeep Prabhu" 
+WORKDIR /app
+COPY .  /app
+RUN apt-get update
+RUN apt-get -y install curl gnupg
+RUN curl -sL https://deb.nodesource.com/setup_14.x  | bash -
+RUN apt-get -y install nodejs
+RUN yarn install
+RUN yarn build
+
+
+#production stage
+FROM nginx:alpine as production-stage
+COPY --from=build-stage /app/build /usr/share/nginx/html
+
+
